@@ -9,15 +9,18 @@ var speedY = 0;
 var snakePartsX = [];
 var snakePartsY = [];
 var Parts = 0;
+var startGame = 1;
+var wonScore = 15;
 
 var size = 20;
 var width = canvas.width;
 var height = canvas.height;
 
-var Random = Math.floor(Math.random() * ((size) - 1));
+var RandomX = Math.floor(Math.random() * ((size) - 1));
+var RandomY = Math.floor(Math.random() * ((size) - 1));
 
-var appleX = Random * size;
-var appleY = Random * size;
+var appleX = RandomX * size;
+var appleY = RandomY * size;
 
 //Game Loop
 function drawGame() {
@@ -28,8 +31,23 @@ function drawGame() {
     drawSnake();
     drawApple();
     eatApple();
-    // console.log(appleX, appleY, Parts);
-    setTimeout(drawGame, 1000 / speed);
+    if (startGame == 1) {
+        setTimeout(drawGame, 1000 / speed);
+    }else if (startGame == 2) { //game Over
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = 'red'
+        ctx.font = '40px fantasy';
+        ctx.fillText('GameOver', 110, 200);    
+        alert('you have LOST press ender to try again!!!')  
+    }else if (startGame == 3) { //won
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = 'yellow'
+        ctx.font = '40px fantasy';
+        ctx.fillText('WON', 155, 200); 
+        alert('you WON press ender to restart!!!')  
+    }
 }
 
 //Screen Clear 
@@ -43,7 +61,6 @@ function drawSnake() {
     ctx.fillRect(headX, headY, size, size);
 
     for (var i = 0; i < snakePartsX.length; i++) {
-        console.log(snakePartsX[i], snakePartsY[i])
         ctx.fillStyle = 'rgb(124,252,0)';
         ctx.fillRect(snakePartsX[i], snakePartsY[i], size, size)
     }
@@ -69,15 +86,17 @@ function drawApple() {
 }
 
 function appleRandom() {
-    Random = Math.floor(Math.random() * ((size) - 1));
-    appleX = Random * size;
-    appleY = Random * size;
+    RandomX = Math.floor(Math.random() * ((size) - 1));
+    RandomY = Math.floor(Math.random() * ((size) - 1));
+    appleX = RandomX * size;
+    appleY = RandomY * size;
 }   
 
 function eatApple() {
     if (headX == appleX && headY == appleY) {
         appleRandom();
         Parts = Parts + 1;
+        won();
     }
 }
 
@@ -98,10 +117,14 @@ function CollisionRules() {
         if (headX == snakePartsX[i] && headY == snakePartsY[i]) {
             gameOver();
         }
+        if (appleX == snakePartsX[i] && appleY == snakePartsY[i]) {
+            appleRandom();
+        }
     }
 }
 
 function gameOver() {
+    startGame = 2;
     Parts = 0;
     snakePartsX = [];
     snakePartsY = [];
@@ -109,6 +132,13 @@ function gameOver() {
     speedY = 0;
     headX = 0;
     headY = 0;
+    score();
+}
+
+function won() {
+    if (Parts == wonScore) {
+        startGame = 3;
+    }
 }
 
 function score() {
@@ -117,6 +147,17 @@ function score() {
     }else {
         document.getElementById("score").innerHTML = "Score: " + Parts;
     }
+}
+
+function reset() {
+    Parts = 0;
+    snakePartsX = [];
+    snakePartsY = [];
+    speedX = 0;
+    speedY = 0;
+    headX = 0;
+    headY = 0;
+    score();
 }
 
 document.body.addEventListener('keydown', keyDown);
@@ -149,6 +190,13 @@ function keyDown(event) {
             return;
         speedY = 0;
         speedX = 1 * size;
+    }
+    if (event.keyCode == 13) {
+        if (startGame == 2 || startGame == 3) {
+            reset();
+            startGame = 1;
+            drawGame();
+        }
     }
 }
 
