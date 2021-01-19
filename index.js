@@ -12,6 +12,7 @@ var Parts = 0;
 var startGame = 1;
 var wonScore = 15;
 
+var grid = true;
 var size = 20;
 var width = canvas.width;
 var height = canvas.height;
@@ -31,6 +32,13 @@ function drawGame() {
     drawSnake();
     drawApple();
     eatApple();
+    if (grid == true) {
+        for (var i = 0; i < size; i++) {
+            ctx.fillStyle = 'black'
+            ctx.fillRect(i * size, 0, 1, height)
+            ctx.fillRect(0, i * size, width, 1)
+        }
+    }
     if (startGame == 1) {
         setTimeout(drawGame, 1000 / speed);
     }else if (startGame == 2) { //game Over
